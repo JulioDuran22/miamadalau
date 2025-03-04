@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Ti 💌</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            background-color: #ffebf0;
+            padding: 20px;
+        }
+        h1 {
+            color: #d63384;
+            font-size: 2em;
+        }
+        .carta {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 60%;
+            margin: auto;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            white-space: pre-line; /* Permite que los saltos de línea se respeten */
+        }
+        p {
+            font-size: 1.2em;
+            color: #555;
+        }
+        .corazon {
+            font-size: 3em;
+            color: red;
+        }
+        .boton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            color: white;
+            background-color: #d63384;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .boton:hover {
+            background-color: #b0256c;
+        }
+    </style>
+</head>
+<body>
+<h1>💌 Para Ti 💌</h1>
+<div class="carta">
+    <p th:utext="${mensaje}"></p> <!-- Renderiza HTML y respeta los <br> -->
+    <div class="corazon">❤️❤️❤️</div>
+    <button class="boton" onclick="window.location.href='/galeria'">🔄 Armar otra foto</button>
+    <button class="boton" onclick="window.location.href='/galeria'"> Regresar al Inicio</button>
+</div>
+</body>
+</html>

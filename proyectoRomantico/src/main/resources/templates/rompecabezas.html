@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rompecabezas Interactivo</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #ffebf0;
+        }
+        h1 {
+            color: #d63384;
+        }
+        #zona-piezas {
+            display: flex;
+            flex-wrap: wrap;
+            width: 320px;
+            margin: 20px auto;
+            gap: 5px;
+            justify-content: center;
+        }
+        #puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            justify-content: center;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: white;
+            border: 2px solid #d63384;
+        }
+        .puzzle-piece, .puzzle-slot {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background-size: 300px 300px;
+            background-repeat: no-repeat;
+        }
+        .puzzle-slot {
+            background-color: #f0f0f0;
+        }
+        #mensaje {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<h1>Arma el Rompecabezas 💖</h1>
+<div id="zona-piezas"></div>
+<div id="puzzle-container"></div>
+<p id="mensaje"></p>
+
+<script>
+    const imagenURL = "[[${fotoSeleccionada}]]";  // Ruta de la imagen del rompecabezas
+    const mensajes = {
+        "imagen1.jpg": "¡Eres increíble! 🌟",
+        "imagen2.jpg": "¡Sigue soñando en grande! 🚀",
+        "imagen3.jpg": "La vida es una aventura, disfrútala. 🌍"
+    };
+
+    function iniciarRompecabezas() {
+        let zonaPiezas = document.getElementById("zona-piezas");
+        let contenedor = document.getElementById("puzzle-container");
+        zonaPiezas.innerHTML = "";
+        contenedor.innerHTML = "";
+
+        let indices = [...Array(9).keys()];  // Crea un array [0,1,2,3,4,5,6,7,8]
+        let piezasMezcladas = indices.slice().sort(() => Math.random() - 0.5); // Mezcla aleatoria
+
+        // 🔹 Crear piezas mezcladas
+        piezasMezcladas.forEach((indice) => {
+            let div = document.createElement("div");
+            div.classList.add("puzzle-piece");
+            div.style.backgroundImage = `url(${imagenURL})`;
+            div.style.backgroundPosition = `${-(indice % 3) * 100}px ${-Math.floor(indice / 3) * 100}px`;
+            div.setAttribute("data-index", indice);
+            div.draggable = true;
+
+            div.ondragstart = (event) => {
+                event.dataTransfer.setData("text", div.getAttribute("data-index"));
+            };
+
+            zonaPiezas.appendChild(div);
+        });
+
+        // 🔹 Crear slots en la cuadrícula
+        indices.forEach((indice) => {
+            let slot = document.createElement("div");
+            slot.classList.add("puzzle-slot");
+            slot.setAttribute("data-index", indice);
+            slot.ondragover = (event) => event.preventDefault();
+
+            slot.ondrop = (event) => {
+                event.preventDefault();
+                let piezaIndex = event.dataTransfer.getData("text");
+                let pieza = document.querySelector(`.puzzle-piece[data-index='${piezaIndex}']`);
+
+                if (!pieza) {
+                    console.log("⚠️ No se encontró la pieza en el DOM.");
+                    return;
+                }
+
+                let slotIndex = slot.getAttribute("data-index");
+                console.log(`🔹 Intentando colocar Pieza ${piezaIndex} en Slot ${slotIndex}`);
+
+                if (slot.firstChild) {
+                    console.log(`↪️ Slot ${slotIndex} ya tiene una pieza. Moviéndola de regreso.`);
+                    zonaPiezas.appendChild(slot.firstChild);
+                }
+
+                slot.appendChild(pieza);
+                verificarCompleto();
+            };
+
+            contenedor.appendChild(slot);
+        });
+
+        console.log("🚀 Rompecabezas iniciado. Piezas mezcladas:", piezasMezcladas);
+    }
+
+    function verificarCompleto() {
+        let slots = document.querySelectorAll(".puzzle-slot");
+        let completo = true;
+
+        slots.forEach(slot => {
+            let pieza = slot.firstChild;
+            let slotIndex = slot.getAttribute("data-index");
+            let piezaIndex = pieza ? pieza.getAttribute("data-index") : "Vacío";
+
+            console.log(`Slot ${slotIndex} → Pieza: ${piezaIndex}`);
+
+            if (!pieza || piezaIndex !== slotIndex) {
+                completo = false;
+            }
+        });
+
+        if (completo) {
+            console.log("✅ ¡Rompecabezas completo! Mostrando mensaje...");
+            let nombreImagen = imagenURL.split('/').pop();
+            let mensaje = mensajes[nombreImagen] || "¡Bien hecho! 🎉";
+
+            document.getElementById("mensaje").innerText = mensaje;
+
+            setTimeout(() => {
+                window.location.assign(`/carta?imagen=${nombreImagen}`);
+
+            }, 3000);
+        } else {
+            console.log("❌ Aún no está completo...");
+        }
+    }
+
+    window.onload = iniciarRompecabezas;
+</script>
+</body>
+</html>
